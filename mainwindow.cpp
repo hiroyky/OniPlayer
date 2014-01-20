@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 MainWindow::~MainWindow() {
+    action->stop();
+    delete sensor;
     delete ui;
 }
 
@@ -149,7 +151,9 @@ void MainWindow::playButtonClicked() {
 void MainWindow::seekSliderChanged(int val) {
     if(frameCountable) {
         try {
+            sensor->start();
             sensor->seek(val);
+            ui->frameEdit->update();
         } catch(std::exception& ex) {
             QMessageBox::warning(this, "exception", ex.what());
         }
