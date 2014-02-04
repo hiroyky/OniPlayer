@@ -30,38 +30,52 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::initSensor(const char* filePath) {
+void MainWindow::initSensor(const char* filePath, const std::string& recordPath) {
     sensor = new DepthSensor();
     sensor->initialize(filePath);
-    if(sensor->isValid()) {
-        int frameNum = sensor->getNumberOfDepthFrames();
-        ui->seekSlider->blockSignals(true);
-        ui->frameEdit->blockSignals(true);
-        frameCountable = (frameNum > 0);
-        ui->frameEdit->setText(QString::number(0));
-        ui->frameLabel->setText(QString::number(frameNum));
-        ui->seekSlider->setEnabled(frameCountable);
-        ui->seekSlider->setMaximum(frameCountable ? frameNum : 0);
-        ui->seekSlider->setValue(0);
-        ui->seekSlider->blockSignals(false);
-        ui->frameEdit->blockSignals(false);
-        
-        action = new Action(sensor, 100);
-        Action::FrameUpdatedEvent func1 = (Action::FrameUpdatedEvent)boost::bind(&MainWindow::frameUpdated, this, _1, _2);
-        boost::function<void ()> func2 = boost::bind(&MainWindow::startSlot, this);
-        boost::function<void ()> func3 = boost::bind(&MainWindow::stopSlot, this);
-        
-        action->connectFrameUpdated(func1);
-        action->connectStarted(func2);
-        action->connectStopped(func3);
-        action->start();
-        ui->frameEdit->initialize(sensor, action);
-    } else {
+    if(!sensor->isValid()) {
         QMessageBox box(this);
         box.setText(tr("Depth sensor is not valiable."));
         box.exec();
         return;
     }
+    
+    if(sensor->isFile()) {
+        initUiForOniPlaying();
+    } else {
+        initUiForRecoding();
+    }
+        
+    action = new Action(sensor, 100);
+    Action::FrameUpdatedEvent func1 = (Action::FrameUpdatedEvent)boost::bind(&MainWindow::frameUpdated, this, _1, _2);
+    boost::function<void ()> func2 = boost::bind(&MainWindow::startSlot, this);
+    boost::function<void ()> func3 = boost::bind(&MainWindow::stopSlot, this);
+        
+    action->connectFrameUpdated(func1);
+    action->connectStarted(func2);
+    action->connectStopped(func3);
+    action->start();
+    ui->frameEdit->initialize(sensor, action);
+}
+
+void MainWindow::initUiForOniPlaying() {
+    int frameNum = sensor->getNumberOfDepthFrames();
+    ui->seekSlider->blockSignals(true);
+    ui->frameEdit->blockSignals(true);
+    frameCountable = (frameNum > 0);
+    ui->frameEdit->setText(QString::number(0));
+    ui->frameLabel->setText(QString::number(frameNum));
+    ui->seekSlider->setEnabled(frameCountable);
+    ui->seekSlider->setMaximum(frameCountable ? frameNum : 0);
+    ui->seekSlider->setValue(0);
+    ui->seekSlider->blockSignals(false);
+    ui->frameEdit->blockSignals(false);
+}
+
+void MainWindow::initUiForRecoding() {
+    ui->seekSlider->setEnabled(false);
+    ui->frameEdit->setVisible(false);
+    ui->frameEdit->setEnabled(false);
 }
 
 void MainWindow::colorShotButtonClicked() {
