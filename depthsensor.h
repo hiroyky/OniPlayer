@@ -4,13 +4,16 @@
 
 #include <iostream>>
 #include <string>
+#include <vector>
 #include <OpenNI.h>
 #include <QImage>>
 #include <opencv2/opencv.hpp>
 #include <stdexcept>
+#include <time.h>
 #include "ImageConverter.h"
 #include "coordpoint.h"
-#include "stdexcept"
+#include "oniprofile.h"
+
 
 /**
 * カラー画像の解像度
@@ -67,6 +70,12 @@ public:
     ~DepthSensor();
 
     /**
+    * 接続されているデバイス情報リストを取得します．
+    * @return デバイス情報リスト
+    */
+    static std::vector<openni::DeviceInfo> getDeviceInfoList();
+
+    /**
     * @brief センサとの接続を初期化します．
     * @detail
     *   カラーと距離データの入力を行うようにセンサを初期化します．
@@ -86,7 +95,7 @@ public:
 
     void stop();
 
-    bool isRunning();
+    bool isRunning() const;
     
     /**
      * OpenNIによってデバイスまたはファイルが利用可能であるかを取得します．
@@ -111,7 +120,7 @@ public:
     /**
     * フレームが録画中であるかを取得します．
     */
-    bool isRecording();
+    bool isRecording() const;
 
     /**
     * @brief カラー画像をCv::Mat形式で取得します．
@@ -127,11 +136,13 @@ public:
 
     cv::Mat getDepthCv16Mat();
     
+    //CoordPointFrame getWorldCoordFromColorAt(int colorX, int colorY) const;
+    
     /**
     * 深度画像のXY座標からワールド座標系の座標値を取得します．
     * ワールド座標系の単位はミリメートルです，
     */
-     CoordPointFrame getWorldCoordFromDepthAt(int depthX, int depthY);
+     CoordPointFrame getWorldCoordFromDepthAt(int depthX, int depthY) const;
 #if 0
     /**
     * カラー画像をQImage形式で取得します．
@@ -174,7 +185,16 @@ public:
     */
     int getDepthHeight();
 
+    /**
+     * 光学画像のフレームレートを取得します．
+     * @return 光学画像のフレームレート
+     */
     int getColorFps();
+    
+    /**
+     * 深度画像のフレームレートを取得します．
+     * @return 深度画像のフレームレート
+     */
     int getDepthFps();
 
     /**
@@ -193,7 +213,7 @@ public:
     /**
     * @return ファイルを再生しているかどうか
     */
-    bool isFile();
+    bool isFile() const;
 
     /**
     * @return PlaybackControlのインスタンス
@@ -214,26 +234,47 @@ public:
     /**
     * @return 現在の深度フレーム番号
     */
-    int getDepthFrameIndex();
+    int getDepthFrameIndex() const;
     
     /**
     * 現在の経過時間を秒で取得します．
     */
-    int getDepthPassedTimeSec();
+    int getDepthPassedTimeSec() const;
 
     /**
-    * 指定したフレームにジャンプします．
-    * @param index フレーム番号
-    */
+     * 撮影開始時間を取得します．
+     * @return 開始時間
+     */
+    time_t getStartTime() const;
+    
+    /**
+     * フレームインデックスからそのフレームが撮影された時間を取得します．
+     */
+    time_t toRealTimeFrom(int frameIndex) const;
+    
+    /**
+     * 現在再生中，撮影中の実時間を取得します．
+     * @return 実時間
+     * @exceptioin センサ停止中に実行した場合
+     */
+    time_t getTime() const;
+    
+    OniProfile getOniProfile() const;
+    
+    /**
+     * 指定したフレームにジャンプします．
+     * @param index フレーム番号
+     */
     void seek(int index);
     
     /**
-    * 指定したフレームにジャンプします．
-    * @param index フレーム番号
-    * @param colorStatus ジャンプの状態を保持する変数
-    * @param depthStatus ジャンプの状態を保持する変数
-    */
+     * 指定したフレームにジャンプします．
+     * @param index フレーム番号
+     * @param colorStatus ジャンプの状態を保持する変数
+     * @param depthStatus ジャンプの状態を保持する変数
+     */
     void seek(int index, openni::Status& colorStatus, openni::Status& depthStatus);
+    
 
 private:
     openni::Device device;
@@ -243,9 +284,11 @@ private:
     openni::VideoFrameRef colorFrame;
     openni::VideoFrameRef depthFrame;
     openni::Recorder recorder;
+    time_t startTime;
     bool recording;
     bool running;
     void changeResolution(openni::VideoStream& stream, int width, int height, int framerate);
+    OniProfile profile;
 };
 
 

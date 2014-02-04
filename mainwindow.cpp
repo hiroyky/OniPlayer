@@ -22,17 +22,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->playButton, SIGNAL(clicked()), this, SLOT(playButtonClicked()));
     connect(ui->seekSlider, SIGNAL(valueChanged(int)), this, SLOT(seekSliderChanged(int)));
     connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
+
+    std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
+    if(deviceInfoList.size() > 0) {
+        initSensor(openni::ANY_DEVICE);
+    }
 }
 
 MainWindow::~MainWindow() {
-    action->stop();
+    if(action) {
+        action->stop();
+    }
     delete sensor;
     delete ui;
+    openni::OpenNI::shutdown();
 }
 
-void MainWindow::initSensor(const char* filePath, const std::string& recordPath) {
+void MainWindow::initSensor(const char* devicePath, const std::string& recordPath) {
     sensor = new DepthSensor();
-    sensor->initialize(filePath);
+    sensor->initialize(devicePath);
     if(!sensor->isValid()) {
         QMessageBox box(this);
         box.setText(tr("Depth sensor is not valiable."));

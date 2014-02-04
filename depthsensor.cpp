@@ -1,11 +1,25 @@
 #include "depthsensor.h"
 
+using boost::posix_time::ptime;
+using boost::posix_time::second_clock;
+using namespace openni;
+
 DepthSensor::DepthSensor() {
     recording = false;
 }
 
 DepthSensor::~DepthSensor() {
 
+}
+
+std::vector<DeviceInfo> DepthSensor::getDeviceInfoList() {
+    Array<DeviceInfo> deviceInfoList;
+    OpenNI::enumerateDevices(&deviceInfoList);
+    std::vector<DeviceInfo> info(deviceInfoList.getSize());
+    for(size_t i = 0; i < deviceInfoList.getSize(); ++i) {
+        info[i] = deviceInfoList[i];
+    }
+    return info;
 }
 
 void DepthSensor::initialize(const char *deviceUri,
@@ -18,6 +32,7 @@ void DepthSensor::initialize(const char *deviceUri,
         throw std::runtime_error("device open failed.");
     }
 
+    device.setDepthColorSyncEnabled(true);
     colorStream.create(device, openni::SENSOR_COLOR);
     depthStream.create(device, openni::SENSOR_DEPTH);
     streams.push_back(&colorStream);
@@ -49,16 +64,21 @@ void DepthSensor::destroy() {
 void DepthSensor::start() {
     colorStream.start();
     depthStream.start();
+    startTime = time(NULL);
     running = true;
+    profile = OniProfile();
+    profile.startTime = second_clock::local_time();
 }
 
 void DepthSensor::stop() {
     colorStream.stop();
     depthStream.stop();
     running = false;
+    profile.endTime = second_clock::local_time();
+    profile.frameNum = getDepthFrameIndex();
 }
 
-bool DepthSensor::isRunning() {
+bool DepthSensor::isRunning() const {
     return running;
 }
 
@@ -97,7 +117,7 @@ void DepthSensor::stopRecord() {
     recording = false;
 }
 
-bool DepthSensor::isRecording() {
+bool DepthSensor::isRecording() const {
     return recording;
 }
 
@@ -113,7 +133,15 @@ cv::Mat DepthSensor::getDepthCv16Mat() {
     return ImageConverter::toCvDepthImage16From(depthFrame);
 }
 
-CoordPointFrame DepthSensor::getWorldCoordFromDepthAt(int depthX, int depthY) {
+#if 0 
+まだできてない
+CoordPointFrame DepthSensor::getWorldCoordFromColorAt(int colorX, int colorY) const {
+    
+    
+}
+#endif
+
+CoordPointFrame DepthSensor::getWorldCoordFromDepthAt(int depthX, int depthY) const {
     float wx, wy, wz;
     unsigned short* depthArray = (unsigned short* )depthFrame.getData();
     float depthZ = depthArray[depthY * depthFrame.getWidth() + depthX];
@@ -241,7 +269,7 @@ const openni::SensorInfo& DepthSensor::getSensorInfo(openni::SensorType type) {
     return *device.getSensorInfo(type);
 }
 
-bool DepthSensor::isFile() {
+bool DepthSensor::isFile() const {
     return device.isFile();
 }
 
@@ -258,17 +286,36 @@ int DepthSensor::getNumberOfColorFrames() {
     return control->getNumberOfFrames(colorStream);
 }
 
-int DepthSensor::getNumberOfDepthFrames() {
+int DepthSensor::getNumberOfDepthFrames()  {
     const openni::PlaybackControl* control = getPlaybackControl();
     return control->getNumberOfFrames(depthStream);    
 }
 
-int DepthSensor::getDepthFrameIndex() {
+int DepthSensor::getDepthFrameIndex() const {
     return depthFrame.getFrameIndex();
 }
 
-int DepthSensor::getDepthPassedTimeSec() {
+int DepthSensor::getDepthPassedTimeSec() const {
     return getDepthFrameIndex() / colorStream.getVideoMode().getFps();
+}
+
+
+time_t DepthSensor::getStartTime() const {
+    return startTime;
+}
+
+time_t DepthSensor::toRealTimeFrom(int frameIndex) const {
+    int passedSec = getDepthPassedTimeSec();
+    return getStartTime() + passedSec;
+}
+
+time_t DepthSensor::getTime() const {
+    int frameIndex = getDepthFrameIndex();
+    return toRealTimeFrom(frameIndex);
+}
+
+OniProfile DepthSensor::getOniProfile() const {
+    return profile;
 }
 
 void DepthSensor::seek(int index) {
