@@ -8,25 +8,25 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
-    ui->setupUi(this);
-    sensor = 0;
-    action = 0;
+        ui->setupUi(this);
+        sensor = 0;
+        action = 0;
         openDirPath = QDir::homePath();
-        
-    openni::OpenNI::initialize();
-        
-    connect(ui->colorShotButton, SIGNAL(clicked()), this, SLOT(colorShotButtonClicked()));
-    connect(ui->depthShotButton, SIGNAL(clicked()), this, SLOT(depthShotButtonClicked()));
-    connect(ui->colorDepthShotButton, SIGNAL(clicked()), this, SLOT(colorDepthShotButtonClicked()));
-    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpened()));
-    connect(ui->playButton, SIGNAL(clicked()), this, SLOT(playButtonClicked()));
-    connect(ui->seekSlider, SIGNAL(valueChanged(int)), this, SLOT(seekSliderChanged(int)));
-    connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
 
-    std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
-    if(deviceInfoList.size() > 0) {
-        initSensor(openni::ANY_DEVICE);
-    }
+        openni::OpenNI::initialize();
+
+        connect(ui->colorShotButton, SIGNAL(clicked()), this, SLOT(colorShotButtonClicked()));
+        connect(ui->depthShotButton, SIGNAL(clicked()), this, SLOT(depthShotButtonClicked()));
+        connect(ui->colorDepthShotButton, SIGNAL(clicked()), this, SLOT(colorDepthShotButtonClicked()));
+        connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpened()));
+        connect(ui->playButton, SIGNAL(clicked()), this, SLOT(playButtonClicked()));
+        connect(ui->seekSlider, SIGNAL(valueChanged(int)), this, SLOT(seekSliderChanged(int)));
+        connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
+
+        std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
+        if(deviceInfoList.size() > 0) {
+            initSensor(openni::ANY_DEVICE);
+        }
 }
 
 MainWindow::~MainWindow() {
@@ -39,37 +39,39 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::initSensor(const char* devicePath, const std::string& recordPath) {
+    delete sensor;
     sensor = new DepthSensor();
-    sensor->initialize(devicePath);
+    sensor->initialize(devicePath, recordPath, ColorAndLoddyDepth);
     if(!sensor->isValid()) {
         QMessageBox box(this);
         box.setText(tr("Depth sensor is not valiable."));
         box.exec();
         return;
     }
-    
+
     if(sensor->isFile()) {
         initUiForOniPlaying();
     } else {
         initUiForRecoding();
     }
-        
-    action = new Action(sensor, 100);
-    Action::FrameUpdatedEvent func1 = (Action::FrameUpdatedEvent)boost::bind(&MainWindow::frameUpdated, this, _1, _2);
-    boost::function<void ()> func2 = boost::bind(&MainWindow::startSlot, this);
-    boost::function<void ()> func3 = boost::bind(&MainWindow::stopSlot, this);
-        
-    action->connectFrameUpdated(func1);
-    action->connectStarted(func2);
-    action->connectStopped(func3);
+
+    action = initAction();
+
+    if(recordPath != "") {
+        sensor->startRecord();
+    }
+
     action->start();
-    ui->frameEdit->initialize(sensor, action);
+    ui->frameEdit->initialize(sensor, action);    
 }
 
 void MainWindow::initUiForOniPlaying() {
     int frameNum = sensor->getNumberOfDepthFrames();
+    ui->seekSlider->setEnabled(true);
+    ui->frameEdit->setVisible(true);
+    ui->frameEdit->setEnabled(true);
     ui->seekSlider->blockSignals(true);
-    ui->frameEdit->blockSignals(true);
+    ui->frameEdit->blockSignals(true);    
     frameCountable = (frameNum > 0);
     ui->frameEdit->setText(QString::number(0));
     ui->frameLabel->setText(QString::number(frameNum));
@@ -84,6 +86,24 @@ void MainWindow::initUiForRecoding() {
     ui->seekSlider->setEnabled(false);
     ui->frameEdit->setVisible(false);
     ui->frameEdit->setEnabled(false);
+}
+
+Action* MainWindow::initAction() {
+    Action* _action = new Action(sensor, 100);
+    Action::FrameUpdatedEvent func1 = (Action::FrameUpdatedEvent)boost::bind(&MainWindow::frameUpdated, this, _1, _2);
+    boost::function<void ()> func2 = boost::bind(&MainWindow::startSlot, this);
+    boost::function<void ()> func3 = boost::bind(&MainWindow::stopSlot, this);
+
+    _action->connectFrameUpdated(func1);
+    _action->connectStarted(func2);
+    _action->connectStopped(func3);
+    return _action;
+}
+
+void MainWindow::stopAction() {
+    if(action != 0) {
+        action->stop();
+    }
 }
 
 void MainWindow::colorShotButtonClicked() {
@@ -142,14 +162,18 @@ void MainWindow::colorDepthShotButtonClicked() {
 }
 
 void MainWindow::actionOpened() {
+    stopAction();
     QString path = QFileDialog::getOpenFileName(this, tr("Open *.oni"), openDirPath, "oni(*.oni)");
     try {
         if(path.length() > 0) {
             initSensor(path.toStdString().c_str());
             QFileInfo info(path);
             openDirPath = info.dir().absolutePath();
+        } else {
+            isValidateRuning();
+            action->start();
         }
-        
+
     } catch(std::exception& ex) {
         QString str = ex.what();
         str += ":" + path;
@@ -160,10 +184,25 @@ void MainWindow::actionOpened() {
 void MainWindow::playButtonClicked() {
     try {
         isValidateRuning();
-        if(action->isRunning()) {
-            action->stop();
+        if(sensor->isFile()) {
+            if(action->isRunning()) {
+                action->stop();
+            } else {
+                action->start();
+            }
         } else {
-            action->start();
+            openni::DeviceInfo info = sensor->getDeviceInfo();
+            if(sensor->isRecording()) {
+                action->stop();
+                sensor->stopRecord();
+                initSensor(info.getUri());
+            } else {
+                stopAction();
+                QString path = QFileDialog::getSaveFileName(this, tr("Save oni image"), saveDirPath, "oni(*.oni)");
+                if(path.length() > 0) {                    
+                    initSensor(info.getUri(), path.toStdString());
+                }
+            }
         }
     } catch (std::exception& ex) {
         std::cout << ex.what() << std::endl;
@@ -191,7 +230,7 @@ void MainWindow::frameUpdatedSlot() {
     depth = depth.scaled(ui->depthLabel->size());
     ui->colorLabel->setPixmap(QPixmap::fromImage(color));
     ui->depthLabel->setPixmap(QPixmap::fromImage(depth));
-    
+
     int frameIndex = ui->frameEdit->update();
     if(frameCountable) {
         ui->seekSlider->blockSignals(true);
@@ -220,7 +259,7 @@ bool MainWindow::isValidateRuning() {
     } else if(!sensor->isValid()) {
         throw std::runtime_error("sensor is initialized. but it is not valiable.");
     }
-    
+
     if(action == 0) {
         throw std::runtime_error("action is null pointer.");
     }

@@ -43,6 +43,9 @@ private:
     void initSensor(const char* devicePath, const std::string& recordPath = "");
     bool isValidateRuning();
     void frameUpdated(const cv::Mat& color, const cv::Mat& depth);
+
+    Action* initAction();
+    void stopAction();
     
     void initUiForOniPlaying();
     void initUiForRecoding();
