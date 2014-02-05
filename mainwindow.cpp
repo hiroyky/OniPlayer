@@ -20,12 +20,18 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(ui->colorDepthShotButton, SIGNAL(clicked()), this, SLOT(colorDepthShotButtonClicked()));
         connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(actionOpened()));
         connect(ui->playButton, SIGNAL(clicked()), this, SLOT(playButtonClicked()));
+        connect(ui->recordButton, SIGNAL(clicked()), this, SLOT(recordButtonClicked()));
         connect(ui->seekSlider, SIGNAL(valueChanged(int)), this, SLOT(seekSliderChanged(int)));
         connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
 
+        QString oniPath = "";
         std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
         if(deviceInfoList.size() > 0) {
             initSensor(openni::ANY_DEVICE);
+        } else if(showOpenOniDialog(oniPath)) {
+            initSensor(oniPath.toStdString().c_str());
+        } else {
+            initUiForNone();
         }
 }
 
@@ -52,7 +58,7 @@ void MainWindow::initSensor(const char* devicePath, const std::string& recordPat
     if(sensor->isFile()) {
         initUiForOniPlaying();
     } else {
-        initUiForRecoding();
+        initUiForRealTimeView();
     }
 
     action = initAction();
@@ -66,11 +72,14 @@ void MainWindow::initSensor(const char* devicePath, const std::string& recordPat
 }
 
 void MainWindow::initUiForOniPlaying() {
-    int frameNum = sensor->getNumberOfDepthFrames();
-    ui->seekSlider->setEnabled(true);
+    setPlayControlsEnabled(true);
+    setShotButtonsEnabled(true);
+    ui->recordButton->setVisible(false);
+    ui->recordButton->setEnabled(false);
+    ui->playButton->setVisible(true);
     ui->frameEdit->setVisible(true);
-    ui->frameEdit->setEnabled(true);
-    ui->seekSlider->blockSignals(true);
+    
+    int frameNum = sensor->getNumberOfDepthFrames();
     ui->frameEdit->blockSignals(true);    
     frameCountable = (frameNum > 0);
     ui->frameEdit->setText(QString::number(0));
@@ -82,10 +91,40 @@ void MainWindow::initUiForOniPlaying() {
     ui->frameEdit->blockSignals(false);
 }
 
-void MainWindow::initUiForRecoding() {
-    ui->seekSlider->setEnabled(false);
+void MainWindow::initUiForRealTimeView() {
+    setPlayControlsEnabled(false);
+    setShotButtonsEnabled(true);
+    
     ui->frameEdit->setVisible(false);
-    ui->frameEdit->setEnabled(false);
+    ui->recordButton->setVisible(true);
+}
+
+void MainWindow::initUiForNone() {
+    setShotButtonsEnabled(false);
+    setPlayControlsEnabled(false);
+}
+
+void MainWindow::setShotButtonsEnabled(bool tf) {
+    ui->colorShotButton->setEnabled(tf);
+    ui->depthShotButton->setEnabled(tf);
+    ui->colorDepthShotButton->setEnabled(tf);
+}
+
+void MainWindow::setPlayControlsEnabled(bool tf) {
+    ui->playButton->setEnabled(tf);
+    ui->recordButton->setEnabled(tf);
+    ui->seekSlider->setEnabled(tf);
+    ui->frameEdit->setEnabled(tf);
+}
+
+bool MainWindow::showOpenOniDialog(QString& path) {
+    path = QFileDialog::getOpenFileName(this, tr("Open oni file"), openDirPath, "oni(*.oni)");
+    return (path.length() > 0);
+}
+
+bool MainWindow::showSaveOniDialog(QString& path) {
+    path = QFileDialog::getSaveFileName(this, tr("Save oni file"), saveDirPath, "oni(*.oni)");
+    return (path.length() > 0);
 }
 
 Action* MainWindow::initAction() {
@@ -107,9 +146,9 @@ void MainWindow::stopAction() {
 }
 
 void MainWindow::colorShotButtonClicked() {
-    action->stop();
     try {
         isValidateRuning();
+        action->stop();
         QString path = QFileDialog::getSaveFileName(this, tr("Save color image"), saveDirPath, "jpeg(*.jpg)|png(*.png)");
         if(path.length() > 0) {
             if(cv::imwrite(path.toStdString(), colorImage)) {
@@ -124,9 +163,9 @@ void MainWindow::colorShotButtonClicked() {
 }
 
 void MainWindow::depthShotButtonClicked() {
-    action->stop();
     try {
         isValidateRuning();
+        action->stop();
         QString path = QFileDialog::getSaveFileName(this, tr("Save depth image"), saveDirPath, "png(*.png)");
         if(path.length() > 0) {
             if(cv::imwrite(path.toStdString(), depthImage)) {
@@ -163,9 +202,9 @@ void MainWindow::colorDepthShotButtonClicked() {
 
 void MainWindow::actionOpened() {
     stopAction();
-    QString path = QFileDialog::getOpenFileName(this, tr("Open *.oni"), openDirPath, "oni(*.oni)");
+    QString path = "";
     try {
-        if(path.length() > 0) {
+        if(showOpenOniDialog(path)) {
             initSensor(path.toStdString().c_str());
             QFileInfo info(path);
             openDirPath = info.dir().absolutePath();
@@ -190,20 +229,34 @@ void MainWindow::playButtonClicked() {
             } else {
                 action->start();
             }
+        }
+    } catch (std::exception& ex) {
+        std::cout << ex.what() << std::endl;
+    }
+}
+
+void MainWindow::recordButtonClicked() {
+    try {
+        isValidateRuning();
+        if(sensor->isFile()) {
+            return;
+        }
+        
+        openni::DeviceInfo info = sensor->getDeviceInfo();
+        if(sensor->isRecording()) {
+            action->stop();
+            sensor->stopRecord();
+            initSensor(info.getUri());
         } else {
-            openni::DeviceInfo info = sensor->getDeviceInfo();
-            if(sensor->isRecording()) {
-                action->stop();
-                sensor->stopRecord();
-                initSensor(info.getUri());
+            stopAction();
+            QString path = "";
+            if(showSaveOniDialog(path)) {
+                initSensor(info.getUri(), path.toStdString());
             } else {
-                stopAction();
-                QString path = QFileDialog::getSaveFileName(this, tr("Save oni image"), saveDirPath, "oni(*.oni)");
-                if(path.length() > 0) {                    
-                    initSensor(info.getUri(), path.toStdString());
-                }
+                action->start();
             }
         }
+        
     } catch (std::exception& ex) {
         std::cout << ex.what() << std::endl;
     }
@@ -247,10 +300,14 @@ void MainWindow::frameUpdated(const cv::Mat& color, const cv::Mat& depth) {
 
 void MainWindow::startSlot() {
     ui->playButton->setText("Pause");
+    QString str = sensor->isRecording() ? "Stop Recording" : "Record";
+    ui->recordButton->setText(str);
+    ui->recordButton->setEnabled(true);
 }
 
 void MainWindow::stopSlot() {
     ui->playButton->setText("Play");
+    ui->recordButton->setEnabled(false);
 }
 
 bool MainWindow::isValidateRuning() {

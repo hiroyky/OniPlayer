@@ -56,6 +56,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="recordButton">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QSlider" name="seekSlider">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
