@@ -93,7 +93,7 @@ void MainWindow::initUiForOniPlaying() {
 
 void MainWindow::initUiForRealTimeView() {
     setPlayControlsEnabled(false);
-    setShotButtonsEnabled(true);
+    setShotButtonsEnabled(false);
     
     ui->frameEdit->setVisible(false);
     ui->recordButton->setVisible(true);
