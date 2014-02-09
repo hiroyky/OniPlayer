@@ -5,6 +5,8 @@
 #include <qfileinfo.h>
 #include <stdexcept>
 
+using namespace openni;
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow) {
@@ -33,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
         } else {
             initUiForNone();
         }
+
+        updateDeviceMenu();
 }
 
 MainWindow::~MainWindow() {
@@ -102,6 +106,17 @@ void MainWindow::initUiForRealTimeView() {
 void MainWindow::initUiForNone() {
     setShotButtonsEnabled(false);
     setPlayControlsEnabled(false);
+}
+
+void MainWindow::updateDeviceMenu() {
+    ui->menuDevices->clear();
+
+    std::vector<openni::DeviceInfo> deviceVec = DepthSensor::getDeviceInfoList();
+    for(size_t i = 0; i < deviceVec.size(); ++i) {
+        QDeviceAction* action = new QDeviceAction(deviceVec[i], this);
+        ui->menuDevices->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(triggeredDeviceAction()));
+    }
 }
 
 void MainWindow::setShotButtonsEnabled(bool tf) {
@@ -298,6 +313,19 @@ void MainWindow::frameUpdated(const cv::Mat& color, const cv::Mat& depth) {
     emit frameUpdatedSignal();
 }
 
+void MainWindow::triggeredDeviceAction() {
+    QDeviceAction* act = qobject_cast<QDeviceAction*>(QObject::sender());
+    openni::DeviceInfo info = act->deviceInfo();
+
+    QMessageBox::StandardButton reply =  QMessageBox::question(this,
+        tr(info.getName()), tr("Do you use this device?"), QMessageBox::Yes | QMessageBox::No);
+
+    if(reply == QMessageBox::Yes) {
+        action->stop();
+        initSensor(info.getUri());
+    }
+}
+
 void MainWindow::startSlot() {
     ui->playButton->setText("Pause");
     QString str = sensor->isRecording() ? "Stop Recording" : "Record";
@@ -321,4 +349,12 @@ bool MainWindow::isValidateRuning() {
         throw std::runtime_error("action is null pointer.");
     }
     return true;
+}
+
+void MainWindow::onDeviceConnected(const DeviceInfo* device) {
+    updateDeviceMenu();
+}
+
+void MainWindow::onDeviceDisconnected(const DeviceInfo* device) {
+    updateDeviceMenu();
 }

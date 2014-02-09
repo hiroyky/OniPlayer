@@ -4,16 +4,20 @@
 #include <QMainWindow>
 #include <qstring.h>
 #include <qimage.h>
+#include <qvector.h>
+#include <qaction.h>
 #include <string>
 #include "depthsensor.h"
 #include "action.h"
+#include "qdeviceaction.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow,
+    public openni::OpenNI::DeviceConnectedListener,
+    public openni::OpenNI::DeviceDisconnectedListener {
     Q_OBJECT
 
 public:
@@ -29,6 +33,7 @@ public slots:
     void recordButtonClicked();
     void frameUpdatedSlot();
     void seekSliderChanged(int);
+    void triggeredDeviceAction();
     
 signals:
     void frameUpdatedSignal();
@@ -85,6 +90,11 @@ private:
     void initUiForRealTimeView();
     
     /**
+    * 接続中のデバイスリストメニューを更新します．
+    */
+    void updateDeviceMenu();    
+
+    /**
      * 再生コントロール用のUIの有効無効を一括して設定します．
      * @param tf true=有効にする, false=無効にする
      */
@@ -107,6 +117,16 @@ private:
     
     void startSlot();
     void stopSlot();
+
+    /**
+    * デバイスが接続された時のイベント
+    */
+    void onDeviceConnected(const openni::DeviceInfo* device);
+
+    /**
+    * デバイスが外されたときのイベント
+    */
+    void onDeviceDisconnected(const openni::DeviceInfo* device);
 };
 
 #endif // MAINWINDOW_H

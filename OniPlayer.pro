@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     depthsensor.cpp \
     imageconverter.cpp \
     seeklineedit.cpp \
-    action.cpp
+    action.cpp \
+    qdeviceaction.cpp
 
 HEADERS  += mainwindow.h \
     depthsensor.h \
@@ -25,7 +26,8 @@ HEADERS  += mainwindow.h \
     coordpoint.h \
     seeklineedit.h \
     action.h \
-    abstractaction.h
+    abstractaction.h \
+    qdeviceaction.h
 
 FORMS    += mainwindow.ui
 
