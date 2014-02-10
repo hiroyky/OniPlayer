@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <iostream>
 #include <QMainWindow>
 #include <qstring.h>
 #include <qimage.h>
@@ -16,14 +17,27 @@ class MainWindow;
 }
 
 class MainWindow : public QMainWindow,
-    public openni::OpenNI::DeviceConnectedListener,
-    public openni::OpenNI::DeviceDisconnectedListener {
+                public openni::OpenNI::DeviceConnectedListener,
+                public openni::OpenNI::DeviceDisconnectedListener,
+                public openni::OpenNI::DeviceStateChangedListener {
     Q_OBJECT
 
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    /**
+     * デバイスが接続された時のイベント
+     */
+    void onDeviceConnected(const openni::DeviceInfo* device);
+        
+    /**
+     * デバイスが外されたときのイベント
+    */
+    void onDeviceDisconnected(const openni::DeviceInfo* device);
+        
+                    
+    void onDeviceStateChanged(const openni::DeviceInfo* device, openni::DeviceState state);
 public slots:
     void colorShotButtonClicked();
     void depthShotButtonClicked();
@@ -118,15 +132,6 @@ private:
     void startSlot();
     void stopSlot();
 
-    /**
-    * デバイスが接続された時のイベント
-    */
-    void onDeviceConnected(const openni::DeviceInfo* device);
-
-    /**
-    * デバイスが外されたときのイベント
-    */
-    void onDeviceDisconnected(const openni::DeviceInfo* device);
 };
 
 #endif // MAINWINDOW_H

@@ -16,7 +16,11 @@ MainWindow::MainWindow(QWidget *parent) :
         openDirPath = QDir::homePath();
 
         openni::OpenNI::initialize();
-
+        updateDeviceMenu();
+        openni::OpenNI::addDeviceConnectedListener(this);
+        openni::OpenNI::addDeviceDisconnectedListener(this);
+        openni::OpenNI::addDeviceStateChangedListener(this);
+        
         connect(ui->colorShotButton, SIGNAL(clicked()), this, SLOT(colorShotButtonClicked()));
         connect(ui->depthShotButton, SIGNAL(clicked()), this, SLOT(depthShotButtonClicked()));
         connect(ui->colorDepthShotButton, SIGNAL(clicked()), this, SLOT(colorDepthShotButtonClicked()));
@@ -25,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(ui->recordButton, SIGNAL(clicked()), this, SLOT(recordButtonClicked()));
         connect(ui->seekSlider, SIGNAL(valueChanged(int)), this, SLOT(seekSliderChanged(int)));
         connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
-
+        
         QString oniPath = "";
         std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
         if(deviceInfoList.size() > 0) {
@@ -35,8 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
         } else {
             initUiForNone();
         }
-
-        updateDeviceMenu();
 }
 
 MainWindow::~MainWindow() {
@@ -352,9 +354,19 @@ bool MainWindow::isValidateRuning() {
 }
 
 void MainWindow::onDeviceConnected(const DeviceInfo* device) {
+    std::cout << "device connected" << std::endl;
     updateDeviceMenu();
 }
 
 void MainWindow::onDeviceDisconnected(const DeviceInfo* device) {
+    std::cout << "device disconnected" << std::endl;
     updateDeviceMenu();
+    if(device->getUri() == sensor->getDeviceInfo().getUri()) {
+        action->stop();
+    }
+}
+
+void MainWindow::onDeviceStateChanged(const openni::DeviceInfo* device, openni::DeviceState state) {
+    
+    std::cout << "changed" << std::endl;
 }
