@@ -16,7 +16,7 @@ std::vector<DeviceInfo> DepthSensor::getDeviceInfoList() {
     Array<DeviceInfo> deviceInfoList;
     OpenNI::enumerateDevices(&deviceInfoList);
     std::vector<DeviceInfo> info(deviceInfoList.getSize());
-    for(size_t i = 0; i < deviceInfoList.getSize(); ++i) {
+    for(size_t i = 0; i < (size_t)deviceInfoList.getSize(); ++i) {
         info[i] = deviceInfoList[i];
     }
     return info;
@@ -37,6 +37,13 @@ void DepthSensor::initialize(const char *deviceUri,
     depthStream.create(device, openni::SENSOR_DEPTH);
     streams.push_back(&colorStream);
     streams.push_back(&depthStream);
+    
+    bool registrationSupported = device.isImageRegistrationModeSupported(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+    if(registrationSupported) {
+        std::cout << "Resigration Support: ON" << std::endl;
+        device.setImageRegistrationMode(openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+    }
+    
     changeColorStreamResolution((RgbResolutionMode)resolutionMode);
     changeDepthStreamResolution((DepthResolutionMode)resolutionMode);
 
