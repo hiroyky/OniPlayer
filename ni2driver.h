@@ -91,6 +91,10 @@ public:
      */
     void getNextFrame(unsigned char* color, short* depth, int timeout = openni::TIMEOUT_FOREVER);
     
+    void getNextFrame(cv::Mat& color, cv::Mat& depth, int timeout = openni::TIMEOUT_FOREVER);
+    
+    void getNextFrame(openni::VideoFrameRef& color, openni::VideoFrameRef& depth, int timeout = openni::TIMEOUT_FOREVER);
+    
     /**
      * @return 入力画像の横幅
      */
@@ -125,6 +129,8 @@ public:
      * @return 使用中のデバイスの製造元
      */
     std::string getDeviceVendor() const;
+    
+    NI2PlaybackControler* getPlaybackControler();
     
     /**
      * @return 接続されているデバイス情報リスト

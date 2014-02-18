@@ -11,7 +11,7 @@
 
 using namespace boost::signals2;
 
-Action::Action(DepthSensor* _sensor, int _intervalMsec) {
+Action::Action(NI2Driver* _sensor, int _intervalMsec) {
     sensor = _sensor;
     intervalMsec = _intervalMsec;
     running = false;
@@ -53,10 +53,8 @@ bool Action::isRunning() {
 
 void Action::process() {
     while(running) {
-        sensor->update();
-        
-        cv::Mat color = sensor->getColorCvMat();
-        cv::Mat depth = sensor->getDepthCvMat();
+        cv::Mat color, depth;
+        sensor->getNextFrame(color, depth);
         
         if(!frameUpdatedSignal.empty()) {
             frameUpdatedSignal(color, depth);

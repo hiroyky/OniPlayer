@@ -11,6 +11,7 @@
 #include "depthsensor.h"
 #include "action.h"
 #include "qdeviceaction.h"
+#include "ni2interfaces.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -54,7 +55,7 @@ signals:
     
 private:
     Ui::MainWindow *ui;
-    DepthSensor* sensor;
+    NI2Driver* sensor;
     Action* action;
     QString openDirPath, saveDirPath;
     cv::Mat colorImage, depthImage;
@@ -68,7 +69,7 @@ private:
      * @param recordPath 録画する場合は，録画先のファイルへのパスを指定．録画しない場合は空白
      */
     void initSensor(const char* devicePath, const std::string& recordPath = "");
-    
+                    
     /**
      * センサデバイス，再生動作を行う上で，各インスタンスなどが適切に設定されているかをチェックします．
      * @exception 不適切な項目があった場合

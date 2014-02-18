@@ -52,8 +52,13 @@ MainWindow::~MainWindow() {
 
 void MainWindow::initSensor(const char* devicePath, const std::string& recordPath) {
     delete sensor;
-    sensor = new DepthSensor();
-    sensor->initialize(devicePath, recordPath, ColorAndLoddyDepth);
+    
+    if(recordPath == "") {
+        sensor = new NI2Driver(devicePath, true, true);
+    } else {
+        sensor = new NI2Driver(recordPath, devicePath, true, true);
+    }
+    
     if(!sensor->isValid()) {
         QMessageBox box(this);
         box.setText(tr("Depth sensor is not valiable."));
@@ -68,13 +73,10 @@ void MainWindow::initSensor(const char* devicePath, const std::string& recordPat
     }
 
     action = initAction();
-
-    if(recordPath != "") {
-        sensor->startRecord();
-    }
-
     action->start();
-    ui->frameEdit->initialize(sensor, action);    
+    if(sensor->isFile()) {
+        ui->frameEdit->initialize(sensor->getPlaybackControler(), action);
+    }
 }
 
 void MainWindow::initUiForOniPlaying() {
@@ -85,7 +87,7 @@ void MainWindow::initUiForOniPlaying() {
     ui->playButton->setVisible(true);
     ui->frameEdit->setVisible(true);
     
-    int frameNum = sensor->getNumberOfDepthFrames();
+    int frameNum = sensor->getPlaybackControler()->getNumberOfFrames();
     ui->frameEdit->blockSignals(true);    
     frameCountable = (frameNum > 0);
     ui->frameEdit->setText(QString::number(0));
@@ -259,16 +261,14 @@ void MainWindow::recordButtonClicked() {
             return;
         }
         
-        openni::DeviceInfo info = sensor->getDeviceInfo();
         if(sensor->isRecording()) {
             action->stop();
-            sensor->stopRecord();
-            initSensor(info.getUri());
+            initSensor(sensor->getDeviceUri().c_str());
         } else {
             stopAction();
             QString path = "";
             if(showSaveOniDialog(path)) {
-                initSensor(info.getUri(), path.toStdString());
+                initSensor(sensor->getDeviceUri().c_str(), path.toStdString());
             } else {
                 action->start();
             }
@@ -283,7 +283,9 @@ void MainWindow::seekSliderChanged(int val) {
     if(frameCountable) {
         try {
             sensor->start();
-            sensor->seek(val);
+            NI2PlaybackControler* controler = sensor->getPlaybackControler();
+            controler->seek(val);
+            delete controler;
             ui->frameEdit->update();
         } catch(std::exception& ex) {
             QMessageBox::warning(this, "exception", ex.what());
@@ -361,7 +363,7 @@ void MainWindow::onDeviceConnected(const DeviceInfo* device) {
 void MainWindow::onDeviceDisconnected(const DeviceInfo* device) {
     std::cout << "device disconnected" << std::endl;
     updateDeviceMenu();
-    if(device->getUri() == sensor->getDeviceInfo().getUri()) {
+    if(device->getUri() == sensor->getDeviceUri()) {
         action->stop();
     }
 }

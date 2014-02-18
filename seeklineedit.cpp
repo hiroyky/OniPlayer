@@ -13,13 +13,13 @@ SeekLineEdit::SeekLineEdit(QWidget* parent): QLineEdit(parent) {
     initialize(0, 0);
 }
 
-SeekLineEdit::SeekLineEdit(DepthSensor* _sensor, AbstractAction* _action, QWidget* parent): QLineEdit(parent) {
+SeekLineEdit::SeekLineEdit(NI2PlaybackControler* _controler, AbstractAction* _action, QWidget* parent): QLineEdit(parent) {
     connected = false;
-    initialize(_sensor, _action);
+    initialize(controler, _action);
 }
 
-void SeekLineEdit::initialize(DepthSensor* _sensor, AbstractAction* _action) {
-    sensor = _sensor;
+void SeekLineEdit::initialize(NI2PlaybackControler* _controler, AbstractAction* _action) {
+    controler = _controler;
     action = _action;
     
     if(!connected) {
@@ -32,7 +32,7 @@ int SeekLineEdit::update() {
     int frameIndex = -1;
     if(isInitialized()) {
         QString str;
-        frameIndex = sensor->getDepthFrameIndex();
+        frameIndex = controler->getFrameIndex();
         str.setNum(frameIndex);
         blockSignals(true);
         setText(str);
@@ -44,7 +44,6 @@ int SeekLineEdit::update() {
 void SeekLineEdit::mousePressEvent(QMouseEvent* e) {
     if(isInitialized()) {
         action->stop();
-        sensor->stop();
         selectAll();
     }
 }
@@ -64,16 +63,15 @@ void SeekLineEdit::valueChangedEvent() {
             throw std::invalid_argument("Entered value is not correct.");
         }
         
-        int numOfFrames = sensor->getNumberOfDepthFrames();
+        int numOfFrames = controler->getNumberOfFrames();
         if(numOfFrames > 0 && val >= numOfFrames) {
             val = 1;
         }
         
         action->stop();
         
-        openni::Status colorStatus, depthStatus;
-        sensor->start();
-        sensor->seek(val, colorStatus, depthStatus);
+        controler->start();
+        controler->seek(val);
         action->start();
         
         setStyleSheet("background: white;");
@@ -83,15 +81,8 @@ void SeekLineEdit::valueChangedEvent() {
 }
 
 bool SeekLineEdit::isInitialized() {
-    if(sensor == 0 || action == 0) {
+    if(controler == 0 || action == 0) {
         return false;
     }
-    if(!sensor->isValid()) {
-        return false;
-    }
-    if(!sensor->isFile()) {
-        return false;
-    }
-    
     return true;
 }

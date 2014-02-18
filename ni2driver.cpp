@@ -7,6 +7,7 @@
 //
 
 #include "ni2driver.h"
+#include "imageconverter.h"
 #include <sstream>
 #include <stdexcept>
 using namespace openni;
@@ -81,6 +82,18 @@ void NI2Driver::getNextFrame(unsigned char* color, short* depth, int timeout) {
     depth = (short*)depthFrame.getData();
 }
 
+void NI2Driver::getNextFrame(cv::Mat &color, cv::Mat &depth, int timeout) {
+    updateFrame(timeout);
+    color = ImageConverter::toCvColorImageFrom(colorFrame);
+    depth = ImageConverter::toCvDepthImage8From(depthFrame);
+}
+
+void NI2Driver::getNextFrame(VideoFrameRef &color, VideoFrameRef &depth, int timeout) {
+    updateFrame(timeout);
+    color = colorFrame;
+    depth = depthFrame;
+}
+
 int NI2Driver::getFrameWidth() const {
     return colorStream.getVideoMode().getResolutionX();
 }
@@ -107,6 +120,15 @@ std::string NI2Driver::getDeviceUri() const {
 
 std::string NI2Driver::getDeviceVendor() const {
     return device.getDeviceInfo().getVendor();
+}
+
+NI2PlaybackControler* NI2Driver::getPlaybackControler() {
+    if(!isFile()) {
+        throw std::runtime_error("connected device is not from file.");
+    }
+    
+    NI2PlaybackControler* controler = new NI2PlaybackControler(this);
+    return controler;
 }
 
 std::vector<DeviceInfo> getConnectedDeviceInfoList() {

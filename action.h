@@ -15,14 +15,14 @@
 #include <boost/bind.hpp>
 #include <boost/signals2/signal.hpp>
 #endif
-#include "depthsensor.h"
+#include "ni2interfaces.hpp"
 #include "abstractaction.h"
 
 class Action: public AbstractAction {
 public:
     typedef boost::function<void (const cv::Mat&, const cv::Mat&)> FrameUpdatedEvent;
     
-    Action(DepthSensor* _sensor, int _intervalMsec);
+    Action(NI2Driver* _sensor, int _intervalMsec);
     void start();
     void stop();
     boost::signals2::connection connectFrameUpdated(FrameUpdatedEvent& func);
@@ -34,7 +34,7 @@ protected:
     void process();
 private:
     boost::thread actionThread;
-    DepthSensor* sensor;
+    NI2Driver* sensor;
     int intervalMsec;
     bool isValidate();
     bool running;

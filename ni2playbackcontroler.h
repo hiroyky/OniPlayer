@@ -24,6 +24,16 @@ public:
     NI2PlaybackControler(NI2Driver* _driver);
     
     /**
+     * センサの動作を開始します，
+     */
+    void start();
+    
+    /**
+     * センサの動作を停止します．
+     */
+    void stop();
+    
+    /**
      * @return ファイルの総フレーム数，多すぎるなど測定不能な場合は-1
      */
     int getNumberOfFrames() const;
