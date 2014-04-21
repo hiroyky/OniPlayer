@@ -10,7 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <stdexcept>
 #include <time.h>
-#include "ImageConverter.h"
+#include "imageconverter.h"
 #include "coordpoint.h"
 #include "oniprofile.h"
 

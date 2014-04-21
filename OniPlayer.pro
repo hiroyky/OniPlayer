@@ -173,24 +173,17 @@ LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopenc
 
 INCLUDEPATH += /usr/include
 DEPENDPATH += /usr/include
-LIBS += -L/usr/lib -lboost_atomic-mt -lboost_chrono-mt\
+LIBS += -L/usr/lib -lboost_chrono-mt\
                    -lboost_chrono -lboost_date_time-mt\
-                                                   -lboost_date_time -lboost_exception-mt\
-                                                   -lboost_exception -lboost_filesystem-mt\
+                                                   -lboost_date_time\
+                                                   -lboost_filesystem-mt\
                                                    -lboost_filesystem -lboost_graph-mt\
                                                    -lboost_graph -lboost_iostreams-mt\
                                                    -lboost_iostreams -lboost_locale-mt\
-                                                   -lboost_log-mt -lboost_log\
-                                                   -lboost_log_setup-mt -lboost_log_setup\
-                                                   -lboost_math_c99-mt -lboost_math_c99\
-                                                   -lboost_math_c99f-mt -lboost_math_c99f -lboost_math_c99l-mt\
-                                                   -lboost_math_c99l -lboost_math_tr1-mt\
-                                                   -lboost_math_tr1 -lboost_math_tr1f-mt\
-                                                   -lboost_math_tr1f -lboost_math_tr1l-mt\
-                                                   -lboost_math_tr1l -lboost_prg_exec_monitor-mt\
+                                                   -lboost_prg_exec_monitor-mt\
                                                    -lboost_prg_exec_monitor -lboost_program_options-mt\
-                                                   -lboost_program_options -lboost_python-mt\
-                                                   -lboost_python -lboost_random-mt\
+                                                   -lboost_program_options\
+                                                   -lboost_random-mt\
                                                    -lboost_random -lboost_regex-mt\
                                                    -lboost_regex -lboost_serialization-mt\
                                                    -lboost_serialization -lboost_signals-mt\

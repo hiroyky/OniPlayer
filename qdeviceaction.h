@@ -1,7 +1,7 @@
 #ifndef QDEVICEACTION_H
 #define QDEVICEACTION_H
 
-#include <openni.h>
+#include <OpenNI.h>
 #include <qobject.h>
 #include <qaction.h>
 
