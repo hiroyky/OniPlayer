@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     imageconverter.cpp \
     seeklineedit.cpp \
     action.cpp \
-    qdeviceaction.cpp
+    qdeviceaction.cpp \
+    ni2playbackcontroler.cpp \
+    ni2driver.cpp
 
 HEADERS  += mainwindow.h \
     depthsensor.h \
@@ -27,7 +29,10 @@ HEADERS  += mainwindow.h \
     seeklineedit.h \
     action.h \
     abstractaction.h \
-    qdeviceaction.h
+    qdeviceaction.h \
+    ni2playbackcontroler.h \
+    ni2interfaces.hpp \
+    ni2driver.h
 
 FORMS    += mainwindow.ui
 
