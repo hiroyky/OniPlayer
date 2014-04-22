@@ -21,6 +21,7 @@
  */
 class NI2Driver {
     friend class NI2PlaybackControler;
+    friend class NI2CoordinateMapper;
 public:
     /**
      * センサ実機を使用するモードで初期化します．
@@ -91,7 +92,23 @@ public:
      */
     void getNextFrame(unsigned char* color, short* depth, int timeout = openni::TIMEOUT_FOREVER);
     
+    /**
+     * 次のフレームを取得します．深度画像は8bitに詰めます
+     */
     void getNextFrame(cv::Mat& color, cv::Mat& depth, int timeout = openni::TIMEOUT_FOREVER);
+    
+    /**
+     * 次のフレームを取得します．深度画像は16bitのまま
+     */
+    void getNextFrameDepth16(cv::Mat& color, cv::Mat& depth16, int timeout = openni::TIMEOUT_FOREVER);
+    
+    /**
+     * 次フレームを取得します．
+     * @param color 光学画像を格納する変数
+     * @param depth8 8bitに詰めた深度画像
+     * @param depth16 16bit生データの深度画像
+     */
+    void getNextFrame(cv::Mat& color, cv::Mat& depth8, cv::Mat& depth16, int timeout = openni::TIMEOUT_FOREVER);
     
     void getNextFrame(openni::VideoFrameRef& color, openni::VideoFrameRef& depth, int timeout = openni::TIMEOUT_FOREVER);
     
@@ -114,6 +131,11 @@ public:
      * @return 現在のフレーム番号
      */
     int getFrameIndex() const;
+    
+    /**
+     * @return 現在の経過秒数
+     */
+    int getTimeSecond() const;
     
     /**
      * @return 使用中のデバイスの名前

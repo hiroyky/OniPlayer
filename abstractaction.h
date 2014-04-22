@@ -7,7 +7,6 @@
 #define _abstractaction__
 
 #include <iostream>
-#include "depthsensor.h"
 
 /**
  * メインの動作を管轄する概要を示すインターフェイスクラスです，

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "imageconverter.h"
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 #include <qfileinfo.h>
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(this, SIGNAL(frameUpdatedSignal()), this, SLOT(frameUpdatedSlot()), Qt::QueuedConnection);
         
         QString oniPath = "";
-        std::vector<openni::DeviceInfo> deviceInfoList = DepthSensor::getDeviceInfoList();
+        std::vector<openni::DeviceInfo> deviceInfoList = NI2Driver::getConnectedDeviceInfoList();
         if(deviceInfoList.size() > 0) {
             initSensor(openni::ANY_DEVICE);
         } else if(showOpenOniDialog(oniPath)) {
@@ -116,7 +117,7 @@ void MainWindow::initUiForNone() {
 void MainWindow::updateDeviceMenu() {
     ui->menuDevices->clear();
 
-    std::vector<openni::DeviceInfo> deviceVec = DepthSensor::getDeviceInfoList();
+    std::vector<openni::DeviceInfo> deviceVec = NI2Driver::getConnectedDeviceInfoList();
     for(size_t i = 0; i < deviceVec.size(); ++i) {
         QDeviceAction* action = new QDeviceAction(deviceVec[i], this);
         ui->menuDevices->addAction(action);

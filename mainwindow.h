@@ -8,7 +8,6 @@
 #include <qvector.h>
 #include <qaction.h>
 #include <string>
-#include "depthsensor.h"
 #include "action.h"
 #include "qdeviceaction.h"
 #include "ni2interfaces.hpp"

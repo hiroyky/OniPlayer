@@ -133,7 +133,7 @@ NI2PlaybackControler* NI2Driver::getPlaybackControler() {
     return controler;
 }
 
-std::vector<DeviceInfo> getConnectedDeviceInfoList() {
+std::vector<DeviceInfo> NI2Driver::getConnectedDeviceInfoList() {
     Array<DeviceInfo> deviceInfoList;
     OpenNI::enumerateDevices(&deviceInfoList);
     std::vector<DeviceInfo> info(deviceInfoList.getSize());

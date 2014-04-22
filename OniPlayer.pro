@@ -14,7 +14,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    depthsensor.cpp \
     imageconverter.cpp \
     seeklineedit.cpp \
     action.cpp \
@@ -23,7 +22,6 @@ SOURCES += main.cpp\
     ni2driver.cpp
 
 HEADERS  += mainwindow.h \
-    depthsensor.h \
     imageconverter.h \
     coordpoint.h \
     seeklineedit.h \

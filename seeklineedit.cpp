@@ -7,6 +7,7 @@
 //
 
 #include "seeklineedit.h"
+#include <stdexcept>
 #include <QIntValidator>
 #include <limits.h>
 
