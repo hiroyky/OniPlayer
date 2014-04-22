@@ -55,10 +55,17 @@ void MainWindow::initSensor(const char* devicePath, const std::string& recordPat
     delete sensor;
     frameCountable = false;
     
-    if(recordPath == "") {
-        sensor = new NI2Driver(devicePath, true, true);
-    } else {
-        sensor = new NI2Driver(recordPath, devicePath, true, true);
+    try {
+        if(recordPath == "") {
+            sensor = new NI2Driver(devicePath, true, true);
+        } else {
+            sensor = new NI2Driver(recordPath, devicePath, true, true);
+        }
+    } catch(std::exception&) {
+        const char* error = openni::OpenNI::getExtendedError();
+        QMessageBox::warning(this, "Error", QString(error));
+        std::cout << error << std::endl;
+        return;
     }
     
     if(!sensor->isValid()) {
