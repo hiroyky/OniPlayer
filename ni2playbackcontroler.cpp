@@ -34,6 +34,11 @@ int NI2PlaybackControler::getFrameIndex() const {
 }
 
 void NI2PlaybackControler::seek(int index) {
+    if(!driver->isFile()) {
+        std::cout << "abort seek because driver is not file." << std::endl;
+        return;
+    }
+    
     bool running = driver->isRunning();
     if(!running) {
         driver->start();
