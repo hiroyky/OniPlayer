@@ -52,6 +52,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::initSensor(const char* devicePath, const std::string& recordPath) {
     delete sensor;
+    frameCountable = false;
     
     if(recordPath == "") {
         sensor = new NI2Driver(devicePath, true, true);

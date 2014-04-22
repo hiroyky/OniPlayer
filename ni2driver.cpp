@@ -48,6 +48,8 @@ void NI2Driver::start() {
     if(recorder.isValid()) {
         recorder.start();
         recording = true;
+    } else {
+        recording = false;
     }
     running = true;
 }
@@ -107,7 +109,7 @@ int NI2Driver::getFps() const {
 }
 
 int NI2Driver::getFrameIndex() const {
-    return colorFrame.getFrameIndex();
+    return (colorFrame.isValid() ? colorFrame.getFrameIndex() : -1);
 }
 
 std::string NI2Driver::getDeviceName() const {
