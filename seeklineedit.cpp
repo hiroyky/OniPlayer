@@ -7,6 +7,8 @@
 //
 
 #include "seeklineedit.h"
+#include <QIntValidator>
+#include <limits.h>
 
 SeekLineEdit::SeekLineEdit(QWidget* parent): QLineEdit(parent) {
     connected = false;
@@ -22,6 +24,12 @@ void SeekLineEdit::initialize(NI2PlaybackControler* _controler, AbstractAction* 
     controler = _controler;
     action = _action;
     
+    if(controler != 0) {
+        int maxFrame = controler->getNumberOfFrames();
+        maxFrame = (maxFrame == -1 ? INT_MAX : maxFrame);
+        setValidator(new QIntValidator(0, maxFrame));
+    }
+        
     if(!connected) {
         connect(this, SIGNAL(editingFinished()), this, SLOT(valueChangedEvent()));
         connected = true;
@@ -61,11 +69,6 @@ void SeekLineEdit::valueChangedEvent() {
     try {
         if(!isOk) {
             throw std::invalid_argument("Entered value is not correct.");
-        }
-        
-        int numOfFrames = controler->getNumberOfFrames();
-        if(numOfFrames > 0 && val >= numOfFrames) {
-            val = 1;
         }
         
         action->stop();
