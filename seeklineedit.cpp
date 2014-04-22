@@ -16,7 +16,7 @@ SeekLineEdit::SeekLineEdit(QWidget* parent): QLineEdit(parent) {
     initialize(0, 0);
 }
 
-SeekLineEdit::SeekLineEdit(NI2PlaybackControler* _controler, AbstractAction* _action, QWidget* parent): QLineEdit(parent) {
+SeekLineEdit::SeekLineEdit(NI2PlaybackControler* _controler, AbstractAction* _action, QWidget* parent): QLineEdit(parent) {    
     connected = false;
     initialize(controler, _action);
 }
@@ -29,6 +29,9 @@ void SeekLineEdit::initialize(NI2PlaybackControler* _controler, AbstractAction* 
         int maxFrame = controler->getNumberOfFrames();
         maxFrame = (maxFrame == -1 ? INT_MAX : maxFrame);
         setValidator(new QIntValidator(0, maxFrame));
+        setEnabled(true);
+    } else {
+        setEnabled(false);
     }
         
     if(!connected) {
