@@ -213,8 +213,8 @@ void MainWindow::colorDepthShotButtonClicked() {
         isValidateRuning();
         QString path = QFileDialog::getSaveFileName(this, tr("Save color image"), saveDirPath, "");
         if(path.length() > 0) {
-            QString colorPath = path + ".jpg";
-            QString depthPath = path + ".png";
+            QString colorPath = path + "_color.bmp";
+            QString depthPath = path + "_depth.bmp";
             bool tf = cv::imwrite(colorPath.toStdString(), colorImage);
             tf &= cv::imwrite(depthPath.toStdString(), depthImage);
             if(tf) {
