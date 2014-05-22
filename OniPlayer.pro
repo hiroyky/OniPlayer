@@ -119,78 +119,14 @@ else: win32:CONFIG(debug, debug|release): LIBS += -LC:\boost\boost_1_54_0\stage\
 
 
 
-macx:LIBS += -L/usr/local/Cellar/boost/1.54.0/lib  -lboost_atomic-mt -lboost_chrono-mt\
-                                                   -lboost_chrono -lboost_date_time-mt\
-                                                   -lboost_date_time -lboost_exception-mt\
-                                                   -lboost_exception -lboost_filesystem-mt\
-                                                   -lboost_filesystem -lboost_graph-mt\
-                                                   -lboost_graph -lboost_iostreams-mt\
-                                                   -lboost_iostreams -lboost_locale-mt\
-                                                   -lboost_log-mt -lboost_log\
-                                                   -lboost_log_setup-mt -lboost_log_setup\
-                                                   -lboost_math_c99-mt -lboost_math_c99\
-                                                   -lboost_math_c99f-mt -lboost_math_c99f -lboost_math_c99l-mt\
-                                                   -lboost_math_c99l -lboost_math_tr1-mt\
-                                                   -lboost_math_tr1 -lboost_math_tr1f-mt\
-                                                   -lboost_math_tr1f -lboost_math_tr1l-mt\
-                                                   -lboost_math_tr1l -lboost_prg_exec_monitor-mt\
-                                                   -lboost_prg_exec_monitor -lboost_program_options-mt\
-                                                   -lboost_program_options -lboost_python-mt\
-                                                   -lboost_python -lboost_random-mt\
-                                                   -lboost_random -lboost_regex-mt\
-                                                   -lboost_regex -lboost_serialization-mt\
-                                                   -lboost_serialization -lboost_signals-mt\
-                                                   -lboost_signals -lboost_system-mt\
-                                                   -lboost_system -lboost_test_exec_monitor-mt\
-                                                   -lboost_test_exec_monitor -lboost_thread-mt\
-                                                   -lboost_timer-mt -lboost_timer\
-                                                   -lboost_unit_test_framework-mt -lboost_unit_test_framework\
-                                                   -lboost_wave-mt -lboost_wave\
-                                                   -lboost_wserialization-mt -lboost_wserialization\
-
-macx:INCLUDEPATH += /usr/local/Cellar/boost/1.54.0/include
-macx:DEPENDPATH += /usr/local/Cellar/boost/1.54.0/include
+macx:LIBS += -L/usr/local/lib
+macx:INCLUDEPATH += /usr/local/include
+macx:DEPENDPATH += /usr/local/include
+macx:LIBS +=  -lboost_atomic-mt -lboost_chrono-mt -lboost_date_time-mt -lboost_exception-mt -lboost_filesystem-mt -lboost_graph-mt -lboost_iostreams-mt  -lboost_locale-mt -lboost_log-mt -lboost_log_setup-mt -lboost_math_c99-mt -lboost_math_c99f-mt -lboost_math_c99l-mt -lboost_math_tr1-mt -lboost_math_tr1f-mt -lboost_math_tr1l-mt -lboost_prg_exec_monitor-mt -lboost_program_options-mt -lboost_random-mt -lboost_regex-mt -lboost_serialization-mt -lboost_signals-mt -lboost_system-mt -lboost_test_exec_monitor-mt -lboost_thread-mt -lboost_timer-mt -lboost_unit_test_framework-mt -lboost_wave-mt -lboost_wserialization-mt
+macx: LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_gpu -lopencv_video -lopencv_objdetect -lopencv_features2d -lopencv_nonfree
+macx: LIBS += -ltbb
 
 macx: LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/ -lOpenNI2
-macx:INCLUDEPATH += /usr/local/Cellar/opencv/2.4.6.1/include
-macx:DEPENDPATH += /usr/local/Cellar/opencv/2.4.6.1/include
-
+macx: LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/OpenNI2/Drivers -lOniFile -lPS1080 -lPSLink
 macx:INCLUDEPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
 macx:DEPENDPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
-
-macx: LIBS += -L/usr/local/Cellar/opencv/2.4.6.1/lib/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_gpu -lopencv_video -lopencv_objdetect -lopencv_features2d -lopencv_nonfree
-
-unix:!macx {
-INCLUDEPATH += $$(HOME)/.local/OpenNI-Linux-Arm-2.2/Include
-DEPENDPATH += $$(HOME)/.local/OpenNI-Linux-Arm-2.2/Include
-LIBS += -L$$(HOME)/.local/OpenNI-Linux-Arm-2.2/Redist -lOpenNI2
-
-INCLUDEPATH += /usr/local/include
-DEPENDPATH += /usr/local/include
-LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_gpu -lopencv_video -lopencv_objdetect -lopencv_features2d -lopencv_nonfree
-
-INCLUDEPATH += /usr/include
-DEPENDPATH += /usr/include
-LIBS += -L/usr/lib -lboost_chrono-mt\
-                   -lboost_chrono -lboost_date_time-mt\
-                                                   -lboost_date_time\
-                                                   -lboost_filesystem-mt\
-                                                   -lboost_filesystem -lboost_graph-mt\
-                                                   -lboost_graph -lboost_iostreams-mt\
-                                                   -lboost_iostreams -lboost_locale-mt\
-                                                   -lboost_prg_exec_monitor-mt\
-                                                   -lboost_prg_exec_monitor -lboost_program_options-mt\
-                                                   -lboost_program_options\
-                                                   -lboost_random-mt\
-                                                   -lboost_random -lboost_regex-mt\
-                                                   -lboost_regex -lboost_serialization-mt\
-                                                   -lboost_serialization -lboost_signals-mt\
-                                                   -lboost_signals -lboost_system-mt\
-                                                   -lboost_system -lboost_test_exec_monitor-mt\
-                                                   -lboost_test_exec_monitor -lboost_thread-mt\
-                                                   -lboost_timer-mt -lboost_timer\
-                                                   -lboost_unit_test_framework-mt -lboost_unit_test_framework\
-                                                   -lboost_wave-mt -lboost_wave\
-                                                   -lboost_wserialization-mt -lboost_wserialization\
-
-}
