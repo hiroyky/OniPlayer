@@ -51,7 +51,7 @@ INCLUDEPATH += $$BOOST_DIR
 DEPENDPATH += $$BOOST_DIR
 
 CONFIG(release, debug|release): LIBS += -L$$OPENCV_DIR/lib -lopencv_core$$OPENCV_VERSION -lopencv_highgui$$OPENCV_VERSION -lopencv_imgproc$$OPENCV_VERSION -lopencv_gpu$$OPENCV_VERSION -lopencv_video$$OPENCV_VERSION -lopencv_objdetect$$OPENCV_VERSION -lopencv_features2d$$OPENCV_VERSION -lopencv_nonfree$$OPENCV_VERSION
-else: CONFIG(debug, debug|release): LIBS += -L$$OPENCV_DIR/lib -lopencv_core$$OPENCV_VERSIONd -lopencv_highgui$$OPENCV_VERSIONd -lopencv_imgproc$$OPENCV_VERSIONd -lopencv_gpu$$OPENCV_VERSIONd -lopencv_video$$OPENCV_VERSIONd -lopencv_objdetect$$OPENCV_VERSIONd -lopencv_features2d$$OPENCV_VERSIONd -lopencv_nonfree$$OPENCV_VERSIONd
+else: CONFIG(debug, debug|release): LIBS += -L$$OPENCV_DIR/lib -lopencv_core$${OPENCV_VERSION}d -lopencv_highgui$${OPENCV_VERSION}d -lopencv_imgproc$${OPENCV_VERSION}d -lopencv_gpu$${OPENCV_VERSION}d -lopencv_video$${OPENCV_VERSION}d -lopencv_objdetect$${OPENCV_VERSION}d -lopencv_features2d$${OPENCV_VERSION}d -lopencv_nonfree$${OPENCV_VERSION}d
 
 LIBS += -L"C:/Program Files/OpenNI2/Lib/" -lOpenNI2
 PRE_TARGETDEPS += "C:/Program Files/OpenNI2/Lib/OpenNI2.lib"
