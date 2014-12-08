@@ -36,97 +36,104 @@ FORMS    += mainwindow.ui
 
 CONFIG(debug, debug|release): DEFINES += _Debug
 
-win32: INCLUDEPATH += C:/OpenCV/opencv-2.4.6/build/x64/vc10/include
-win32: DEPENDPATH += C:/OpenCV/opencv-2.4.6/build/x64/vc10/include
-win32: INCLUDEPATH += "C:/Program Files/OpenNI2/Include"
-win32: DEPENDPATH += "C:/Program Files/OpenNI2/Include"
-win32: INCLUDEPATH += C:/boost/boost_1_54_0
-win32: DEPENDPATH += C:/boost/boost_1_54_0
+win32 {
+OPENCV_DIR = C:/OpenCV/opencv-2.4.9/build/x64/vc11/
+OPENCV_VERSION = 249
+BOOST_DIR = C:/boost/boost_1_55_0
+BOOST_VERSION = vc110-mt-1_55
+BOOST_VERSION_DEBUG = vc110-mt-gd-1_55
 
-win32: CONFIG(release, debug|release): LIBS += -LC:/OpenCV/opencv-2.4.6/build/x64/vc10/lib/ -lopencv_core246 -lopencv_highgui246 -lopencv_imgproc246 -lopencv_gpu246 -lopencv_video246 -lopencv_objdetect246 -lopencv_features2d246 -lopencv_nonfree246d
-else: win32:CONFIG(debug, debug|release): LIBS += -LC:/OpenCV/opencv-2.4.6/build/x64/vc10/lib/ -lopencv_core246d -lopencv_highgui246d -lopencv_imgproc246d -lopencv_gpu246d -lopencv_video246d -lopencv_objdetect246d -lopencv_features2d246 -lopencv_nonfree246
+INCLUDEPATH += $$OPENCV_DIR/include
+DEPENDPATH += $$OPENCV_DIR/include
+INCLUDEPATH += "C:/Program Files/OpenNI2/Include"
+DEPENDPATH += "C:/Program Files/OpenNI2/Include"
+INCLUDEPATH += $$BOOST_DIR
+DEPENDPATH += $$BOOST_DIR
 
-win32: LIBS += -L"C:/Program Files/OpenNI2/Lib/" -lOpenNI2
-win32: PRE_TARGETDEPS += "C:/Program Files/OpenNI2/Lib/OpenNI2.lib"
+CONFIG(release, debug|release): LIBS += -L$$OPENCV_DIR/lib -lopencv_core$$OPENCV_VERSION -lopencv_highgui$$OPENCV_VERSION -lopencv_imgproc$$OPENCV_VERSION -lopencv_gpu$$OPENCV_VERSION -lopencv_video$$OPENCV_VERSION -lopencv_objdetect$$OPENCV_VERSION -lopencv_features2d$$OPENCV_VERSION -lopencv_nonfree$$OPENCV_VERSION
+else: CONFIG(debug, debug|release): LIBS += -L$$OPENCV_DIR/lib -lopencv_core$${OPENCV_VERSION}d -lopencv_highgui$${OPENCV_VERSION}d -lopencv_imgproc$${OPENCV_VERSION}d -lopencv_gpu$${OPENCV_VERSION}d -lopencv_video$${OPENCV_VERSION}d -lopencv_objdetect$${OPENCV_VERSION}d -lopencv_features2d$${OPENCV_VERSION}d -lopencv_nonfree$${OPENCV_VERSION}d
 
-win32: CONFIG(release, debug|release): LIBS += -LC:\boost\boost_1_54_0\stage\lib \
--llibboost_atomic-vc100-mt-1_54 \
--llibboost_chrono-vc100-mt-1_54 \
--llibboost_context-vc100-mt-1_54 \
--llibboost_coroutine-vc100-mt-1_54 \
--llibboost_date_time-vc100-mt-1_54 \
--llibboost_exception-vc100-mt-1_54 \
--llibboost_filesystem-vc100-mt-1_54 \
--llibboost_graph-vc100-mt-1_54 \
--llibboost_iostreams-vc100-mt-1_54 \
--llibboost_locale-vc100-mt-1_54 \
--llibboost_log-vc100-mt-1_54 \
--llibboost_log_setup-vc100-mt-1_54 \
--llibboost_math_c99-vc100-mt-1_54 \
--llibboost_math_c99f-vc100-mt-1_54 \
--llibboost_math_c99l-vc100-mt-1_54 \
--llibboost_math_tr1-vc100-mt-1_54 \
--llibboost_math_tr1f-vc100-mt-1_54 \
--llibboost_math_tr1l-vc100-mt-1_54 \
--llibboost_prg_exec_monitor-vc100-mt-1_54 \
--llibboost_program_options-vc100-mt-1_54 \
--llibboost_python-vc100-mt-1_54 \
--llibboost_random-vc100-mt-1_54 \
--llibboost_regex-vc100-mt-1_54 \
--llibboost_serialization-vc100-mt-1_54 \
--llibboost_signals-vc100-mt-1_54 \
--llibboost_system-vc100-mt-1_54 \
--llibboost_test_exec_monitor-vc100-mt-1_54 \
--llibboost_thread-vc100-mt-1_54 \
--llibboost_timer-vc100-mt-1_54 \
--llibboost_unit_test_framework-vc100-mt-1_54 \
--llibboost_wave-vc100-mt-1_54 \
--llibboost_wserialization-vc100-mt-1_54
+LIBS += -L"C:/Program Files/OpenNI2/Lib/" -lOpenNI2
+PRE_TARGETDEPS += "C:/Program Files/OpenNI2/Lib/OpenNI2.lib"
 
-else: win32:CONFIG(debug, debug|release): LIBS += -LC:\boost\boost_1_54_0\stage\lib \
--llibboost_atomic-vc100-mt-gd-1_54 \
--llibboost_chrono-vc100-mt-gd-1_54 \
--llibboost_context-vc100-mt-gd-1_54 \
--llibboost_coroutine-vc100-mt-gd-1_54 \
--llibboost_date_time-vc100-mt-gd-1_54 \
--llibboost_exception-vc100-mt-gd-1_54 \
--llibboost_filesystem-vc100-mt-gd-1_54 \
--llibboost_graph-vc100-mt-gd-1_54 \
--llibboost_iostreams-vc100-mt-gd-1_54 \
--llibboost_locale-vc100-mt-gd-1_54 \
--llibboost_log-vc100-mt-gd-1_54 \
--llibboost_log_setup-vc100-mt-gd-1_54 \
--llibboost_math_c99-vc100-mt-gd-1_54 \
--llibboost_math_c99f-vc100-mt-gd-1_54 \
--llibboost_math_c99l-vc100-mt-gd-1_54 \
--llibboost_math_tr1-vc100-mt-gd-1_54 \
--llibboost_math_tr1f-vc100-mt-gd-1_54 \
--llibboost_math_tr1l-vc100-mt-gd-1_54 \
--llibboost_prg_exec_monitor-vc100-mt-gd-1_54 \
--llibboost_program_options-vc100-mt-gd-1_54 \
--llibboost_python-vc100-mt-gd-1_54 \
--llibboost_random-vc100-mt-gd-1_54 \
--llibboost_regex-vc100-mt-gd-1_54 \
--llibboost_serialization-vc100-mt-gd-1_54 \
--llibboost_signals-vc100-mt-gd-1_54 \
--llibboost_system-vc100-mt-gd-1_54 \
--llibboost_test_exec_monitor-vc100-mt-gd-1_54 \
--llibboost_thread-vc100-mt-gd-1_54 \
--llibboost_timer-vc100-mt-gd-1_54 \
--llibboost_unit_test_framework-vc100-mt-gd-1_54 \
--llibboost_wave-vc100-mt-gd-1_54 \
--llibboost_wserialization-vc100-mt-gd-1_54
+CONFIG(release, debug|release): LIBS += -L$$BOOST_DIR\lib \
+-llibboost_atomic-$$BOOST_VERSION \
+-llibboost_chrono-$$BOOST_VERSION \
+-llibboost_context-$$BOOST_VERSION \
+-llibboost_coroutine-$$BOOST_VERSION \
+-llibboost_date_time-$$BOOST_VERSION \
+-llibboost_exception-$$BOOST_VERSION \
+-llibboost_filesystem-$$BOOST_VERSION \
+-llibboost_graph-$$BOOST_VERSION \
+-llibboost_iostreams-$$BOOST_VERSION \
+-llibboost_locale-$$BOOST_VERSION \
+-llibboost_log-$$BOOST_VERSION \
+-llibboost_log_setup-$$BOOST_VERSION \
+-llibboost_math_c99-$$BOOST_VERSION \
+-llibboost_math_c99f-$$BOOST_VERSION \
+-llibboost_math_c99l-$$BOOST_VERSION \
+-llibboost_math_tr1-$$BOOST_VERSION \
+-llibboost_math_tr1f-$$BOOST_VERSION \
+-llibboost_math_tr1l-$$BOOST_VERSION \
+-llibboost_prg_exec_monitor-$$BOOST_VERSION \
+-llibboost_program_options-$$BOOST_VERSION \
+-llibboost_python-$$BOOST_VERSION \
+-llibboost_random-$$BOOST_VERSION \
+-llibboost_regex-$$BOOST_VERSION \
+-llibboost_serialization-$$BOOST_VERSION \
+-llibboost_signals-$$BOOST_VERSION \
+-llibboost_system-$$BOOST_VERSION \
+-llibboost_test_exec_monitor-$$BOOST_VERSION \
+-llibboost_thread-$$BOOST_VERSION \
+-llibboost_timer-$$BOOST_VERSION \
+-llibboost_unit_test_framework-$$BOOST_VERSION \
+-llibboost_wave-$$BOOST_VERSION \
+-llibboost_wserialization-$$BOOST_VERSION
 
+else: CONFIG(debug, debug|release): LIBS += -L$$BOOST_DIR\lib \
+-llibboost_atomic-$$BOOST_VERSION_DEBUG \
+-llibboost_chrono-$$BOOST_VERSION_DEBUG \
+-llibboost_context-$$BOOST_VERSION_DEBUG \
+-llibboost_coroutine-$$BOOST_VERSION_DEBUG \
+-llibboost_date_time-$$BOOST_VERSION_DEBUG \
+-llibboost_exception-$$BOOST_VERSION_DEBUG \
+-llibboost_filesystem-$$BOOST_VERSION_DEBUG \
+-llibboost_graph-$$BOOST_VERSION_DEBUG \
+-llibboost_iostreams-$$BOOST_VERSION_DEBUG \
+-llibboost_locale-$$BOOST_VERSION_DEBUG \
+-llibboost_log-$$BOOST_VERSION_DEBUG \
+-llibboost_log_setup-$$BOOST_VERSION_DEBUG \
+-llibboost_math_c99-$$BOOST_VERSION_DEBUG \
+-llibboost_math_c99f-$$BOOST_VERSION_DEBUG \
+-llibboost_math_c99l-$$BOOST_VERSION_DEBUG \
+-llibboost_math_tr1-$$BOOST_VERSION_DEBUG \
+-llibboost_math_tr1f-$$BOOST_VERSION_DEBUG \
+-llibboost_math_tr1l-$$BOOST_VERSION_DEBUG \
+-llibboost_prg_exec_monitor-$$BOOST_VERSION_DEBUG \
+-llibboost_program_options-$$BOOST_VERSION_DEBUG \
+-llibboost_python-$$BOOST_VERSION_DEBUG \
+-llibboost_random-$$BOOST_VERSION_DEBUG \
+-llibboost_regex-$$BOOST_VERSION_DEBUG \
+-llibboost_serialization-$$BOOST_VERSION_DEBUG \
+-llibboost_signals-$$BOOST_VERSION_DEBUG \
+-llibboost_system-$$BOOST_VERSION_DEBUG \
+-llibboost_test_exec_monitor-$$BOOST_VERSION_DEBUG \
+-llibboost_thread-$$BOOST_VERSION_DEBUG \
+-llibboost_timer-$$BOOST_VERSION_DEBUG \
+-llibboost_unit_test_framework-$$BOOST_VERSION_DEBUG \
+-llibboost_wave-$$BOOST_VERSION_DEBUG \
+-llibboost_wserialization-$$BOOST_VERSION_DEBUG
+}
 
-
-macx:LIBS += -L/usr/local/lib
-macx:INCLUDEPATH += /usr/local/include
-macx:DEPENDPATH += /usr/local/include
-macx:LIBS +=  -lboost_atomic-mt -lboost_chrono-mt -lboost_date_time-mt -lboost_exception-mt -lboost_filesystem-mt -lboost_graph-mt -lboost_iostreams-mt  -lboost_locale-mt -lboost_log-mt -lboost_log_setup-mt -lboost_math_c99-mt -lboost_math_c99f-mt -lboost_math_c99l-mt -lboost_math_tr1-mt -lboost_math_tr1f-mt -lboost_math_tr1l-mt -lboost_prg_exec_monitor-mt -lboost_program_options-mt -lboost_random-mt -lboost_regex-mt -lboost_serialization-mt -lboost_signals-mt -lboost_system-mt -lboost_test_exec_monitor-mt -lboost_thread-mt -lboost_timer-mt -lboost_unit_test_framework-mt -lboost_wave-mt -lboost_wserialization-mt
-macx: LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_gpu -lopencv_video -lopencv_objdetect -lopencv_features2d -lopencv_nonfree
-macx: LIBS += -ltbb
-
-macx: LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/ -lOpenNI2
-macx: LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/OpenNI2/Drivers -lOniFile -lPS1080 -lPSLink
-macx:INCLUDEPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
-macx:DEPENDPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
+macx {
+LIBS += -L/usr/local/lib
+INCLUDEPATH += /usr/local/include
+DEPENDPATH += /usr/local/include
+LIBS +=  -lboost_atomic-mt -lboost_chrono-mt -lboost_date_time-mt -lboost_exception-mt -lboost_filesystem-mt -lboost_graph-mt -lboost_iostreams-mt  -lboost_locale-mt -lboost_log-mt -lboost_log_setup-mt -lboost_math_c99-mt -lboost_math_c99f-mt -lboost_math_c99l-mt -lboost_math_tr1-mt -lboost_math_tr1f-mt -lboost_math_tr1l-mt -lboost_prg_exec_monitor-mt -lboost_program_options-mt -lboost_random-mt -lboost_regex-mt -lboost_serialization-mt -lboost_signals-mt -lboost_system-mt -lboost_test_exec_monitor-mt -lboost_thread-mt -lboost_timer-mt -lboost_unit_test_framework-mt -lboost_wave-mt -lboost_wserialization-mt
+LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_gpu -lopencv_video -lopencv_objdetect -lopencv_features2d -lopencv_nonfree
+LIBS += -ltbb
+LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/ -lOpenNI2
+LIBS += -L$$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Redist/OpenNI2/Drivers -lOniFile -lPS1080 -lPSLink
+INCLUDEPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
+DEPENDPATH += $$(HOME)/.local/OpenNI-MacOSX-x64-2.2/Include
+}
